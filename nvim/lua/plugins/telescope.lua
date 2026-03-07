@@ -20,6 +20,26 @@ return {
         },
         extensions = {
           undo = {
+            mappings = {
+              i = {
+                ["<CR>"] = require("telescope-undo.actions").restore,
+                ["<S-CR>"] = function(prompt_bufnr)
+                  return function()
+                    require("telescope-undo.actions").restore(prompt_bufnr)()
+                    vim.cmd("undo")
+                  end
+                end,
+              },
+              n = {
+                ["<CR>"] = require("telescope-undo.actions").restore,
+                ["<S-CR>"] = function(prompt_bufnr)
+                  return function()
+                    require("telescope-undo.actions").restore(prompt_bufnr)()
+                    vim.cmd("undo")
+                  end
+                end,
+              },
+            },
             side_by_side = true,
             layout_strategy = "vertical",
             layout_config = {
@@ -28,7 +48,6 @@ return {
           },
         },
       })
-      pcall(telescope.load_extension, "yank_history")
     end,
   },
 }
