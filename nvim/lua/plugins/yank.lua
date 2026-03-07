@@ -17,6 +17,10 @@ return {
         },
       }
     end,
+    config = function(_, opts)
+      require("yanky").setup(opts)
+      require("telescope").load_extension("yank_history")
+    end,
     keys = {
       -- stylua: ignore
     { "<leader>p", function() require("telescope").extensions.yank_history.yank_history({ }) end, desc = "Open Yank History" },

@@ -185,10 +185,14 @@ alias k="kubectl"
 alias o="opencode"
 
 # Python (Pyenv)
-if command -v pyenv &> /dev/null; then
-    alias python="$(pyenv which python)"
-    alias pip="$(pyenv which pip)"
-fi
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+# if command -v pyenv &> /dev/null; then
+#   export PATH="$HOME/.pyenv/bin:$PATH"
+#   eval "$(pyenv init -)"
+    # alias python="$(pyenv which python)"
+    # alias pip="$(pyenv which pip)"
+# fi
 
 # =============================================================================
 # FUNCTIONS

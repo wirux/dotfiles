@@ -8,6 +8,7 @@ return {
     },
     keys = {
       { "<C-u>", "<cmd>Telescope undo<cr>", desc = "Telescope Undo" },
+      { "<leader>,", "<cmd>Telescope buffers sort_mru=true ignore_current_buffer=true<cr>", desc = "Switch Buffer" },
     },
     config = function()
       local telescope = require("telescope")
@@ -19,6 +20,26 @@ return {
         },
         extensions = {
           undo = {
+            mappings = {
+              i = {
+                ["<CR>"] = require("telescope-undo.actions").restore,
+                ["<S-CR>"] = function(prompt_bufnr)
+                  return function()
+                    require("telescope-undo.actions").restore(prompt_bufnr)()
+                    vim.cmd("undo")
+                  end
+                end,
+              },
+              n = {
+                ["<CR>"] = require("telescope-undo.actions").restore,
+                ["<S-CR>"] = function(prompt_bufnr)
+                  return function()
+                    require("telescope-undo.actions").restore(prompt_bufnr)()
+                    vim.cmd("undo")
+                  end
+                end,
+              },
+            },
             side_by_side = true,
             layout_strategy = "vertical",
             layout_config = {
@@ -27,7 +48,6 @@ return {
           },
         },
       })
-      pcall(telescope.load_extension, "yank_history")
     end,
   },
 }
