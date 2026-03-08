@@ -1,7 +1,12 @@
 // --- UI & THEME ---
 theme "catppuccin-mocha"
-// default_layout "default" // To mówi Zellij, żeby załadował nasz nowy zjstatus!
+default_layout "default" // Tells Zellij to load our custom zjstatus layout
 pane_frames false
+// Disabled because Ghostty's kitty protocol encoding of Alt+Backspace (\e[127;3u)
+// is not correctly matched by Zellij's key bindings. Legacy mode sends \e\x7f instead,
+// which Zellij parses reliably. Tradeoff: neovim inside Zellij loses kitty protocol
+// key disambiguation (Ctrl+i vs Tab, etc.).
+support_kitty_keyboard_protocol true
 // --- CLIPBOARD ---
 copy_command "pbcopy"
 copy_clipboard "system"
@@ -9,18 +14,19 @@ copy_clipboard "system"
 // --- KEYBINDINGS ---
 keybinds {
     shared {
-            // Wysyła natywne Esc + Delete (macOS Backspace to technicznie Delete = kod 127)
-            // Zrozumie to zarówno bash/zsh, jak i Neovim w trybie Insert.
-            bind "Alt Backspace" { Write 27 127; }
+            // Sends Ctrl+W (byte 23) = universal word-erase in bash/zsh/readline
+            bind "Alt Backspace" "Alt Delete" { Write 23; }
         }
     locked {
-        // Pozwala wejść do menu zarządzania oknami nawet, gdy Zellij jest zablokowany przez Neovima
+        // Allows entering window management even when Zellij is locked by Neovim
         bind "Ctrl Space" { SwitchToMode "Tmux"; }
     }
     // 1. NORMAL MODE
     normal {
         // Free up Ctrl keys for Neovim
         unbind "Ctrl p" "Ctrl t" "Ctrl n"  "Ctrl s" "Ctrl o" "Ctrl q" "Ctrl g"
+        // Ghostty sends Alt+f for Option+Right (macOS word-forward), which triggers ToggleFloatingPanes
+        unbind "Alt f" "Alt Right"
 // "Ctrl h"
         
         // Enter Tmux mode
@@ -31,7 +37,7 @@ keybinds {
     // clear-defaults=true removes Zellij's built-in tmux binds so your custom ones show up on the bar
     tmux clear-defaults=true {
         
-        // Escape hatch: wysyła Ctrl+Space do terminala
+        // Escape hatch: sends Ctrl+Space through to the terminal
         bind "Ctrl Space" { Write 0; SwitchToMode "Normal"; }
 
         // --- A. YOUR CLASSIC TMUX MUSCLE MEMORY ---
@@ -40,10 +46,10 @@ keybinds {
         bind "\\" "|" { NewPane "Right"; SwitchToMode "Normal"; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
         
-        // Zmiana nazwy z czyszczeniem starej (dokładnie jak tab -> r)
+        // Rename tab, clearing the old name first (like prefix + , in tmux)
         bind "," { SwitchToMode "RenameTab"; TabNameInput 0; }
         
-        // --- Skakanie po zakładkach numerami (tmux prefix + 1-9) ---
+        // --- Jump to tab by number (tmux prefix + 1-9) ---
         bind "1" { GoToTab 1; SwitchToMode "Normal"; }
         bind "2" { GoToTab 2; SwitchToMode "Normal"; }
         bind "3" { GoToTab 3; SwitchToMode "Normal"; }
@@ -57,7 +63,7 @@ keybinds {
         bind "q" { CloseFocus; SwitchToMode "Normal"; }
         bind "d" { Detach; }
 
-        // Nawigacja Vim
+        // Vim-style pane navigation
         bind "h" { MoveFocus "Left"; SwitchToMode "Normal"; }
         bind "j" { MoveFocus "Down"; SwitchToMode "Normal"; }
         bind "k" { MoveFocus "Up"; SwitchToMode "Normal"; }
@@ -72,6 +78,9 @@ keybinds {
         bind "o" { SwitchToMode "Session"; }
         bind "m" { SwitchToMode "Move"; } 
         
+        // Floating pane toggle (replaces default Alt+f / Option+Right)
+        bind "a" { ToggleFloatingPanes; SwitchToMode "Normal"; }
+
         bind "Esc" "Enter" { SwitchToMode "Normal"; }
     }
 
