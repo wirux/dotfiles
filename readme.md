@@ -15,7 +15,7 @@ This repository hosts my personal configuration files (dotfiles), meticulously c
 
 ### ⚡ Core Tools
 *   **Shell**: Zsh configured with Powerlevel10k for a fast and informative prompt. ([See details](home/README.md))
-*   **Terminal**: iTerm2 with custom profiles and keybindings.
+*   **Terminal**: Ghostty modern and fast.
 *   **Input**: Karabiner-Elements for advanced key mapping modifications.
 *   **Navigation**: `zoxide` for smarter directory jumping.
 *   **Search**: `fzf`, `ripgrep`, and `fd` for blazing fast fuzzy finding and searching.
