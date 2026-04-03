@@ -14,14 +14,14 @@ This repository hosts my personal configuration files (dotfiles), meticulously c
 ## ✨ Features
 
 ### ⚡ Core Tools
-*   **Shell**: Zsh configured with Powerlevel10k for a fast and informative prompt.
-*   **Terminal**: iTerm2 with custom profiles and keybindings.
+*   **Shell**: Zsh configured with Powerlevel10k for a fast and informative prompt. ([See details](home/README.md))
+*   **Terminal**: Ghostty modern and fast.
 *   **Input**: Karabiner-Elements for advanced key mapping modifications.
 *   **Navigation**: `zoxide` for smarter directory jumping.
 *   **Search**: `fzf`, `ripgrep`, and `fd` for blazing fast fuzzy finding and searching.
 
 ### 📝 Neovim (LazyVim)
-A fully-featured Neovim setup powered by **LazyVim**.
+A fully-featured Neovim setup powered by **LazyVim**. ([See details](nvim/README.md))
 *   **Package Manager**: `lazy.nvim`
 *   **LSP & Formatting**: Built-in support for various languages (Lua, Python, Go, Terraform, etc.).
 *   **File Explorer**: Neo-tree.
@@ -29,11 +29,11 @@ A fully-featured Neovim setup powered by **LazyVim**.
 *   **Key Plugins**: Telescope, Treesitter, Which-key, Harpoon, and more.
 
 ### 🖥️ Tmux
-A robust terminal multiplexer configuration.
+A robust terminal multiplexer configuration. ([See details](tmux/README.md))
 *   **Manager**: TPM (Tmux Plugin Manager).
 *   **Theme**: Catppuccin (Mocha/Frappe).
 *   **Navigation**: `vim-tmux-navigator` for seamless transitions between Vim and Tmux panes.
-*   **Utilities**: `tmux-sensible`, `tmux-yank`.
+*   **Utilities**: `tmux-sensible`, `tmux-yank`, `sessionx`, `extrakto`.
 
 ## 🛠️ Prerequisites
 
@@ -53,10 +53,7 @@ git clone https://github.com/yourusername/dotfiles.git ~/.config
 ### 2. Install Dependencies
 ```bash
 # Core utils
-brew install ripgrep fd fzf bat zoxide
-
-# Tmux specific
-brew install reattach-to-user-namespace
+brew install ripgrep fd fzf bat zoxide imagemagick
 ```
 
 ### 3. Link Configuration
@@ -76,11 +73,13 @@ Open tmux and press `prefix` + `I` to install plugins via TPM.
 
 ## 📂 Structure
 
+Click on the links below to view the detailed documentation for each core component:
+
 ```text
 .config/
-├── home/              # Home directory configurations (.zshrc, .p10k.zsh)
-├── nvim/              # Neovim configuration (LazyVim)
-├── tmux/              # Tmux configuration and plugins
+├── home/              # 🔗 [Zsh & Shell Config](home/README.md) (.zshrc, .p10k.zsh)
+├── nvim/              # 🔗 [Neovim Config](nvim/README.md) (LazyVim setup)
+├── tmux/              # 🔗 [Tmux Config](tmux/README.md) (TPM, Catppuccin)
 ├── iterm2/            # iTerm2 support files
 ├── karabiner/         # Keyboard mapping rules
 ├── terraform/         # Terraform configurations

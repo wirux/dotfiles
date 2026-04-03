@@ -194,7 +194,7 @@
                         "product_id": 10203,
                         "vendor_id": 5824
                     },
-                    "ignore": false,
+                    "ignore": true,
                     "manipulate_caps_lock_led": true,
                     "mouse_flip_horizontal_wheel": false,
                     "mouse_flip_vertical_wheel": false,

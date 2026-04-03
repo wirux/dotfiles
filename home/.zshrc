@@ -9,16 +9,12 @@ fi
 # ENVIRONMENT VARIABLES
 # =============================================================================
 
-# Set language
 export LANG=en_US.UTF-8
-
-# REPO Directory
 export REPO="$HOME/Documents/repos"
 
 # Ruby
 if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
   export PATH=/opt/homebrew/opt/ruby/bin:$PATH
-  # Check if gem is available before running it to avoid errors
   if command -v gem &> /dev/null; then
       export PATH="$(gem environment gemdir)/bin:$PATH"
   fi
@@ -43,23 +39,21 @@ if [ -f "$(brew --prefix)/opt/powerlevel10k/share/powerlevel10k/powerlevel10k.zs
     source "$(brew --prefix)/opt/powerlevel10k/share/powerlevel10k/powerlevel10k.zsh-theme"
 fi
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Config for p10k
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # =============================================================================
 # ZSH OPTIONS & HISTORY
 # =============================================================================
 
-# History config
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
-
-# Options
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+setopt share_history          # Useful with tmux — shared history across panes
 setopt complete_aliases
 
 # =============================================================================
@@ -69,22 +63,40 @@ setopt complete_aliases
 autoload -U +X bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
 
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu no                            # Disabled — fzf-tab takes over
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*' group-name ''
+
+# fzf-tab preview rules
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath'
+zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always --icons $realpath'
+zstyle ':fzf-tab:complete:cat:*' fzf-preview 'bat --color=always --style=numbers --line-range=:50 $realpath 2>/dev/null || eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:bat:*' fzf-preview 'bat --color=always --style=numbers --line-range=:50 $realpath 2>/dev/null || eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:nvim:*' fzf-preview 'bat --color=always --style=numbers --line-range=:50 $realpath 2>/dev/null || eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:n:*' fzf-preview 'bat --color=always --style=numbers --line-range=:50 $realpath 2>/dev/null || eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps -p $word -o pid,user,%cpu,%mem,command'
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
+
+# fzf-tab appearance
+zstyle ':fzf-tab:*' fzf-flags --height=40% --layout=reverse --border --info=inline
+zstyle ':fzf-tab:*' switch-group '<' '>'
+
 # =============================================================================
 # PLUGINS & EXTENSIONS
 # =============================================================================
 
-# Define plugins list (Note: This array is typically used by Oh My Zsh, 
-# but defined here for reference or if OMZ is loaded later/manually)
 plugins=( 
   git
   terraform
   macos
-  ruby
-  rails
+  # ruby
+  # rails
   bundler
 )
 
-# Docker Desktop Init
+# Docker Desktop
 if [ -f "/Users/adamwilczek/.docker/init-zsh.sh" ]; then
     source /Users/adamwilczek/.docker/init-zsh.sh || true
 fi
@@ -92,15 +104,15 @@ fi
 # Zsh Autosuggestions
 if [ -f "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
     source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    ZSH_AUTOSUGGEST_STRATEGY=(history completion) 
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 fi
 
-# Zsh Autocomplete
-if [ -f "$(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh" ]; then
-    source "$(brew --prefix)/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh"
+# fzf-tab (must load AFTER compinit and autosuggestions)
+if [ -f "$(brew --prefix)/share/fzf-tab/fzf-tab.plugin.zsh" ]; then
+    source "$(brew --prefix)/share/fzf-tab/fzf-tab.plugin.zsh"
 fi
 
-# Zsh Syntax Highlighting
+# Zsh Syntax Highlighting (should be loaded last)
 if [ -f "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
     source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
@@ -114,41 +126,39 @@ fi
 # TOOL INITIALIZATIONS
 # =============================================================================
 
-# zoxide (cd replacement)
 if command -v zoxide &> /dev/null; then
     eval "$(zoxide init zsh)"
 fi
 
-# fzf (fuzzy finder)
 if command -v fzf &> /dev/null; then
     source <(fzf --zsh)
 fi
 
-# direnv
 if command -v direnv &> /dev/null; then
     eval "$(direnv hook zsh)"
+fi
+
+# atuin — modern shell history with SQLite backend and fuzzy search
+if command -v atuin &> /dev/null; then
+    eval "$(atuin init zsh --disable-up-arrow)"
 fi
 
 # =============================================================================
 # APPLICATION SPECIFIC CONFIG
 # =============================================================================
 
-# Azure
 if [ -f ~/.zsh/autocompletion_addons/az.completion ]; then
     source ~/.zsh/autocompletion_addons/az.completion
 fi
 
-# Terraform
 if command -v terraform &> /dev/null; then
     complete -o nospace -C /opt/homebrew/bin/terraform terraform
 fi
 
-# Kubectl
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
 fi
 
-# Google Cloud SDK
 if [ -f "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc" ]; then
     source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
 fi
@@ -160,22 +170,27 @@ fi
 # ALIASES
 # =============================================================================
 
-# General
 alias l="ls -lah"
 alias ll="ls -la"
-# Check if lsd is installed for enhanced ls
-if command -v lsd &> /dev/null; then
-    alias ls="lsd"
-    alias tree="lsd --tree"
+
+if command -v eza &> /dev/null; then
+    alias ls="eza --icons --group-directories-first"
+    alias tree="eza --tree --icons --group-directories-first"
+    alias la="eza -la --icons --group-directories-first --git"
+    alias lt="eza -la --icons --sort=modified --reverse"
 fi
-alias cat="bat" # Ensure bat is installed, otherwise this might fail if not handled. 
-                # Ideally: if command -v bat &> /dev/null; then alias cat="bat"; fi
+
+if command -v bat &> /dev/null; then
+    alias cat="bat"
+fi
 
 # Git
 alias gs="git status"
 alias gc="git commit -a -m"
 alias gp="git push"
 alias ga="git add ."
+alias gd="git diff"
+alias gl="git log --oneline --graph --decorate -20"
 
 # Applications
 alias nv="nvim"
@@ -184,43 +199,47 @@ alias cd="z"
 alias k="kubectl"
 alias o="opencode"
 
-# Python (Pyenv)
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-# if command -v pyenv &> /dev/null; then
-#   export PATH="$HOME/.pyenv/bin:$PATH"
-#   eval "$(pyenv init -)"
-    # alias python="$(pyenv which python)"
-    # alias pip="$(pyenv which pip)"
-# fi
+# =============================================================================
+# PYTHON (Pyenv)
+# =============================================================================
+
+if command -v pyenv &> /dev/null; then
+    export PATH="$HOME/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
 
-# Find file and run nvim on it
-# Requires: fd, fzf, bat, nvim
 fnv() {
   local find="$1"
   if command -v fd &> /dev/null && command -v fzf &> /dev/null && command -v nvim &> /dev/null; then
-      fd --hidden --exclude .git  "$find" | fzf --preview='bat {}' | xargs nvim
+      fd --hidden --exclude .git "$find" | fzf --preview='bat --color=always --style=numbers {}' | xargs nvim
   else
       echo "Error: fnv requires fd, fzf, and nvim to be installed."
   fi
 }
 
+peek() {
+  if [ -z "$1" ]; then
+    echo "Usage: peek <file>"
+    return 1
+  fi
+  bat --color=always --style=numbers,header,grid "$@"
+}
+
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
 # =============================================================================
 # KEY BINDINGS
 # =============================================================================
-
-# Autosuggest
-bindkey '^I'   complete-word 
+KEYTIMEOUT=15
+# Tab = fzf-tab completion (handled by plugin automatically)
+bindkey '^I'   complete-word
 bindkey '^I^I' autosuggest-accept
-
-# Cursor movement
-bindkey -M menuselect  '^[[D' .backward-char  '^[OD' .backward-char
-bindkey -M menuselect  '^[[C'  .forward-char  '^[OC'  .forward-char
-
 # =============================================================================
 # SECRETS
 # =============================================================================
