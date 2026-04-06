@@ -31,7 +31,12 @@ if [ -d "$HOME/.duckdb/cli/latest" ]; then
   export PATH="$HOME/.duckdb/cli/latest:$PATH"
 fi
 
-# =============================================================================
+# AI Chat CLI
+if command -v aichat &> /dev/null; then
+  export AICHAT_CONFIG_DIR="$HOME/.config/aichat"
+fi
+
+ # =============================================================================
 # THEME (Powerlevel10k)
 # =============================================================================
 
