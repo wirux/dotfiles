@@ -145,6 +145,7 @@ fi
 
 # atuin — modern shell history with SQLite backend and fuzzy search
 if command -v atuin &> /dev/null; then
+    export ATUIN_DB_PATH="$HOME/.local/share/atuin/history-zsh.db"
     eval "$(atuin init zsh --disable-up-arrow)"
 fi
 
@@ -202,7 +203,9 @@ alias nv="nvim"
 alias n="nvim"
 alias cd="z"
 alias k="kubectl"
-alias o="opencode"
+alias o="open"
+alias oc="opencode"
+alias cl="claude"
 
 # =============================================================================
 # PYTHON (Pyenv)
@@ -245,6 +248,8 @@ KEYTIMEOUT=15
 # Tab = fzf-tab completion (handled by plugin automatically)
 bindkey '^I'   complete-word
 bindkey '^I^I' autosuggest-accept
+# Delete (forward delete) — accept autosuggestion (inline ghost from history)
+bindkey '\e[3~' autosuggest-accept
 # =============================================================================
 # SECRETS
 # =============================================================================
