@@ -257,3 +257,10 @@ bindkey '\e[3~' autosuggest-accept
 if [ -f "$HOME/.secretsrc" ]; then
     source "$HOME/.secretsrc"
 fi
+
+# opencode
+export PATH=/Users/adamwilczek/.opencode/bin:$PATH
+
+# Disable oh-my-opencode telemetry
+export OMO_SEND_ANONYMOUS_TELEMETRY=0
+export OMO_DISABLE_POSTHOG=1
