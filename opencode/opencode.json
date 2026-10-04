@@ -1,37 +1,50 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "gemini-3-low",
+  "model": "google/gemini-3-pro-preview",
   "small_model": "google/gemini-2.5-flash-lite",
   "mcp": {
-    "obsidian-mcp-server": {
+    "nobleBrainer": {
       "type": "local",
-      "command": ["npx", "-y", "obsidian-semantic-mcp"],
+      "command": [
+        "npx",
+        "-y",
+        "@wirux/mcp-markdown-vault@latest"
+      ],
       "enabled": true,
       "environment": {
-        "OBSIDIAN_API_KEY": "{env:OBSIDIAN_API_KEY}",
-        "OBSIDIAN_BASE_URL": "http://127.0.0.1:27123",
-        "OBSIDIAN_VERIFY_SSL": "false",
-        "OBSIDIAN_ENABLE_CACHE": "true"
-      },
+        "VAULT_PATH": "/Users/adamwilczek/Library/Mobile Documents/iCloud~md~obsidian/Documents/nobleBrainer"
+      }
     }
   },
   "provider": {
     "google": {
       "models": {
-        "gemini-3-high":{
+        "gemini-3-high": {
           "name": "Gemini 3 High",
           "id": "gemini-3-pro-preview",
           "options": {
             "thinking_level": "high",
             "safetySettings": [
-              { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH" },
-              { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH" },
-              { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH" },
-              { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH" }
+              {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              }
             ]
           }
         },
-        "gemini-3-low":{
+        "gemini-3-low": {
           "name": "Gemini 3 Low",
           "id": "gemini-3-pro-preview",
           "options": {
@@ -41,23 +54,270 @@
             "thinking_level": "low",
             "systemInstruction": "Return only code or brief explanations. No filler text.",
             "safetySettings": [
-              { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH" },
-              { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH" },
-              { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH" },
-              { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH" }
+              {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              }
             ]
+          }
+        },
+        "gemini-2.5-flash": {
+          "name": "Gemini 2.5 Flash (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gemini-2.5-pro": {
+          "name": "Gemini 2.5 Pro (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gemini-3-flash-preview": {
+          "name": "Gemini 3 Flash Preview (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gemini-3-pro-preview": {
+          "name": "Gemini 3 Pro Preview (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gemini-3.1-pro-preview": {
+          "name": "Gemini 3.1 Pro Preview (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gemini-3.1-pro-preview-customtools": {
+          "name": "Gemini 3.1 Pro Preview Custom Tools (Gemini CLI)",
+          "limit": {
+            "context": 1048576,
+            "output": 65535
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        }
+      }
+    },
+    "github-copilot": {
+      "models": {
+        "claude-fable-5": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "claude-haiku-4.5": {
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        },
+        "claude-opus-4.5": {
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "claude-opus-4.6": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "claude-opus-4.7": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "claude-opus-4.8": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "claude-sonnet-4.5": {
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        },
+        "claude-sonnet-4.6": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "claude-sonnet-5": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "gemini-2.5-pro": {
+          "limit": {
+            "context": 128000,
+            "output": 64000
+          }
+        },
+        "gemini-3-flash-preview": {
+          "limit": {
+            "context": 128000,
+            "output": 64000
+          }
+        },
+        "gemini-3.1-pro-preview": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "gemini-3.5-flash": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          }
+        },
+        "gpt-5-mini": {
+          "limit": {
+            "context": 192000,
+            "output": 64000
+          }
+        },
+        "gpt-5.3-codex": {
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          }
+        },
+        "gpt-5.4": {
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          }
+        },
+        "gpt-5.4-mini": {
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          }
+        },
+        "gpt-5.5": {
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          }
+        },
+        "mai-code-1-flash-picker": {
+          "limit": {
+            "context": 256000,
+            "output": 128000
           }
         }
       }
     }
   },
+  "plugin": [
+    "@tarquinen/opencode-dcp@latest",
+    "opencode-snip@latest",
+    "@ramtinj95/opencode-tokenscope",
+    "@slkiser/opencode-quota",
+    "oh-my-openagent@latest"
+  ],
   "tui": {
-      "scroll_speed": 3,
-      "scroll_acceleration": {
-        "enabled": true
-      }
-    },
+    "scroll_speed": 3,
+    "scroll_acceleration": {
+      "enabled": true
+    }
+  },
   "keybinds": {
-    "leader": "ctrl+s",
+    "leader": "ctrl+s"
+  },
+  "experimental": {
+    "quotaToast": {
+      "enableToast": true,
+      "showSessionTokens": true,
+      "enabledProviders": "auto",
+      "formatStyle": "classic"
+    }
   }
 }
