@@ -5,7 +5,12 @@ own Bluetooth profile, and a sentinel keycode makes the mouse follow.
 
 ```
 Glove80 macro ──F19/F20──► Karabiner ──► mxbolt ──HID++──► MX Master 3S
+Glove80 key   ──F13-F16──► Karabiner ──► mon    ──DDC───► P3425WE / U3824DW
 ```
+
+The two rows are deliberately independent. Monitors are not tied to the mouse
+and keyboard: moving one picture across the desk while the keyboard stays put is
+the common case, and coupling them would make that impossible.
 
 ## Build
 
@@ -25,6 +30,30 @@ mxbolt -d 2       # address receiver device index 2 (default 1)
 ```
 
 Slot numbers are 1-based, matching the labels on the device.
+
+## mon
+
+```sh
+mon private              # both monitors to this Mac
+mon company              # both monitors to the company Mac
+mon top company          # one monitor, absolute
+mon toggle bottom        # one monitor, relative to where it is now
+mon status               # where each monitor currently is
+```
+
+Monitors are addressed by **role**, never by model or m1ddc index, so the input
+table lives in exactly one place — the top of the script:
+
+| role     | model    | private      | company      |
+| -------- | -------- | ------------ | ------------ |
+| `top`    | P3425WE  | `27` USB-C   | `15` DP      |
+| `bottom` | U3824DW  | `15` DP      | `27` USB-C   |
+
+Note the table is mirrored: each Mac reaches one monitor over USB-C and the
+other over DP.
+
+`mon` needs no compiler and no hidapi — `make install-mon` is enough on a
+machine that only drives monitors.
 
 ## Hard constraints, each established by measurement
 
@@ -53,8 +82,24 @@ occasionally lost.
 
 ## Karabiner
 
-The rule already lives in this repo, in `../karabiner/karabiner.json` — look for
-the `Glove80:` complex modification. Note that adding a rule through the UI
+The rules already live in this repo, in `../karabiner/karabiner.json` — look for
+the `Glove80:` complex modifications. The sentinel table is the contract between
+this repo and the keymap repo; change it in both or not at all:
+
+| sentinel | runs                 | effect                        |
+| -------- | -------------------- | ----------------------------- |
+| `F13`    | `mon company`        | both monitors to company Mac  |
+| `F14`    | `mon private`        | both monitors to this Mac     |
+| `F15`    | `mon toggle top`     | flip P3425WE                  |
+| `F16`    | `mon toggle bottom`  | flip U3824DW                  |
+| `F19`    | `mxbolt -q 1`        | mouse to company Mac          |
+| `F20`    | `mxbolt -q 3`        | mouse to this Mac             |
+
+Only F19/F20 are tapped from a macro that also switches the Bluetooth profile,
+because only they hand the keyboard over. F13-F16 are plain `&kp` — nothing
+leaves, so there is no window to beat.
+
+Note that adding a rule through the UI
 *copies* it out of `assets/complex_modifications/`, so editing an asset file
 afterwards has no effect on the running config; edit `karabiner.json` itself.
 
@@ -76,7 +121,7 @@ never `$HOME`.
 
 ```
 U3824DW   DP    <- private Mac        USB-C <- company Mac (its base)
-P3425WE   USB-C <- private Mac (base) HDMI  <- company Mac
+P3425WE   USB-C <- private Mac (base) DP    <- company Mac
 ```
 
 Each monitor's USB hub belongs to whichever machine holds its USB-C input, so
@@ -85,7 +130,7 @@ travel to the company Mac and this machine would lose its link to the mouse.
 
 ## Monitors over DDC
 
-Not wired to the sentinel, but verified and useful (`brew install m1ddc`):
+Driven by `mon`, see above (`brew install m1ddc`):
 
 ```sh
 m1ddc display <id> set input 15     # DP
@@ -99,6 +144,10 @@ m1ddc display <id> set luminance 33
 - **Verify with a read-back.** `set` reports success even when the monitor
   silently discards the command, and P3425WE corrupts roughly 2% of reads — read
   twice and require agreement.
+- **A read failure is noise, not signal.** Reading a monitor parked on the other
+  Mac's input works fine: 10 consecutive reads of P3425WE on the company DP input
+  returned the right value 9 times and `-7` once. So `-7` means "try again", not
+  "the monitor is elsewhere" — do not build state detection on it.
 - Dell stores picture settings **per input**, which doubles as a reliable way to
   tell which input is active.
 - No USB-C hub or dock passes DDC: seven were tested, HDMI and DisplayPort
@@ -110,9 +159,9 @@ m1ddc display <id> set luminance 33
 
 ## Still unverified
 
-- Which HDMI port the company Mac uses on P3425WE (17 vs 18). Auto Select bounces
-  back to the live input when the other machine is asleep, so this cannot be
-  probed from here — read the label on the monitor.
+- That the company Mac is really on P3425WE's **DP** input. The monitor accepts
+  `15` and holds it without Auto Select bouncing back, which suggests a live
+  signal there, but only the far side can confirm it. This replaced HDMI (`17`).
 - Which slot the company Mac occupies: the mouse reports three hosts and sits on
   slot 3, but slots 1 and 2 have not been identified.
 - That a second Bolt receiver on the company Mac behaves the same way. Reasonable
