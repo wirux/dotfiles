@@ -52,8 +52,14 @@ table lives in exactly one place — the top of the script:
 Note the table is mirrored: each Mac reaches one monitor over USB-C and the
 other over DP.
 
-`mon` needs no compiler and no hidapi — `make install-mon` is enough on a
-machine that only drives monitors.
+`mon` is **not installed anywhere** — Karabiner and the Stream Deck bundles call
+`~/.config/handoff/bin/mon` directly. It is a script, so there is nothing to
+build, and a copy in `~/.local/bin` would only be a second version to forget to
+update. `mxbolt` is installed because a compiled binary cannot be run from where
+its source lives.
+
+On a machine that only drives monitors there is nothing to install at all: clone
+this repo and point Karabiner at the script. No compiler, no hidapi.
 
 ## Hard constraints, each established by measurement
 

@@ -33,7 +33,7 @@
                                     "key_code": "f13",
                                     "modifiers": { "optional": ["any"] }
                                 },
-                                "to": [{ "shell_command": "/Users/adamwilczek/.local/bin/mon company" }],
+                                "to": [{ "shell_command": "/Users/adamwilczek/.config/handoff/bin/mon company" }],
                                 "type": "basic"
                             },
                             {
@@ -41,7 +41,7 @@
                                     "key_code": "f14",
                                     "modifiers": { "optional": ["any"] }
                                 },
-                                "to": [{ "shell_command": "/Users/adamwilczek/.local/bin/mon private" }],
+                                "to": [{ "shell_command": "/Users/adamwilczek/.config/handoff/bin/mon private" }],
                                 "type": "basic"
                             },
                             {
@@ -49,7 +49,7 @@
                                     "key_code": "f15",
                                     "modifiers": { "optional": ["any"] }
                                 },
-                                "to": [{ "shell_command": "/Users/adamwilczek/.local/bin/mon toggle top" }],
+                                "to": [{ "shell_command": "/Users/adamwilczek/.config/handoff/bin/mon toggle top" }],
                                 "type": "basic"
                             },
                             {
@@ -57,7 +57,7 @@
                                     "key_code": "f16",
                                     "modifiers": { "optional": ["any"] }
                                 },
-                                "to": [{ "shell_command": "/Users/adamwilczek/.local/bin/mon toggle bottom" }],
+                                "to": [{ "shell_command": "/Users/adamwilczek/.config/handoff/bin/mon toggle bottom" }],
                                 "type": "basic"
                             }
                         ]
