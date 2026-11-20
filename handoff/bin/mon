@@ -1,0 +1,102 @@
+#!/bin/zsh
+# mon - move monitor inputs between the two Macs on this desk.
+#
+#   mon private           both monitors to this Mac
+#   mon company           both monitors to the company Mac
+#   mon top company       one monitor, absolute
+#   mon toggle top        one monitor, relative to where it is now
+#   mon status            report where each monitor currently is
+#
+# Sentinel keycodes F13-F16 reach this script through Karabiner. The mouse and
+# keyboard are a separate concern - see mxbolt and F19/F20.
+
+set -u
+
+M=/opt/homebrew/bin/m1ddc
+
+ROLES=(top bottom)
+typeset -A MODEL PRIVATE COMPANY
+MODEL[top]=P3425WE     PRIVATE[top]=27     COMPANY[top]=15
+MODEL[bottom]=U3824DW  PRIVATE[bottom]=15  COMPANY[bottom]=27
+
+die() { print -u2 "mon: $*"; exit 1; }
+
+# Resolved on every call, never cached: the m1ddc index and the UUID both shift
+# when a connection path changes, and switching an input changes that path.
+id_for() {
+  $M display list 2>/dev/null \
+    | grep -- "${MODEL[$1]}" \
+    | sed -E 's/^\[([0-9]+)\].*/\1/' \
+    | head -1
+}
+
+# The P3425WE corrupts a fraction of DDC reads - measured 1 in 10, surfacing as
+# -7 - so a value is only trusted once two readings agree on it.
+read_input() {
+  local id v seen= n
+  id=$(id_for "$1") || return 1
+  [[ -n $id ]] || return 1
+  for n in {1..6}; do
+    v=$($M display "$id" get input 2>/dev/null)
+    [[ $v == <-> ]] || continue
+    [[ $v == "$seen" ]] && { print -- "$v"; return 0 }
+    seen=$v
+  done
+  return 1
+}
+
+# m1ddc reports success even when the monitor silently discards the write, so
+# every set is confirmed by reading the value back.
+set_input() {
+  local role=$1 want=$2 id got n
+  for n in 1 2; do
+    id=$(id_for "$role")
+    [[ -n $id ]] || die "$role (${MODEL[$role]}) not connected to this Mac"
+    $M display "$id" set input "$want" >/dev/null 2>&1
+    sleep 1
+    got=$(read_input "$role") && [[ $got == "$want" ]] && return 0
+  done
+  return 1
+}
+
+where() {
+  local v
+  v=$(read_input "$1") || { print unknown; return 1 }
+  case $v in
+    ${PRIVATE[$1]}) print private ;;
+    ${COMPANY[$1]}) print company ;;
+    *)              print "other($v)" ;;
+  esac
+}
+
+move() {
+  local role=$1 want
+  case $2 in
+    private) want=${PRIVATE[$role]} ;;
+    company) want=${COMPANY[$role]} ;;
+    *)       die "unknown side: $2" ;;
+  esac
+  set_input "$role" "$want" || die "$role (${MODEL[$role]}) refused input $want"
+}
+
+case ${1:-} in
+  private|company)
+    for r in $ROLES; do move "$r" "$1"; done
+    ;;
+  toggle)
+    [[ -n ${MODEL[${2:-}]:-} ]] || die "usage: mon toggle <top|bottom>"
+    # An unreadable monitor resolves toward this Mac: the key was pressed here,
+    # so this is almost certainly where the picture is wanted.
+    if [[ $(where "$2") == private ]]; then move "$2" company; else move "$2" private; fi
+    ;;
+  top|bottom)
+    [[ ${2:-} == (private|company) ]] || die "usage: mon $1 <private|company>"
+    move "$1" "$2"
+    ;;
+  status)
+    for r in $ROLES; do printf '%-7s %-9s %s\n' "$r" "${MODEL[$r]}" "$(where $r)"; done
+    ;;
+  *)
+    die "usage: mon <private|company> | mon <top|bottom> <private|company> | mon toggle <top|bottom> | mon status"
+    ;;
+esac
