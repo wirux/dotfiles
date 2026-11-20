@@ -14,3 +14,5 @@ tt.*
 *.log
 *lock*
 .DS_Store
+!/macos/
+!/macos/**
